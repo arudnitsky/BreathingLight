@@ -5,11 +5,13 @@ from RGB import RGB
 
 PWM_FREQ_HZ = 1_000
 
+
 def sign(x):
-    if (x >=0):
+    if x >= 0:
         return 1
     else:
         return -1
+
 
 def InitPwmOnPin(pin):
     pwm = PWM(Pin(pin))
@@ -17,10 +19,11 @@ def InitPwmOnPin(pin):
     pwm.freq(PWM_FREQ_HZ)
     return pwm
 
+
 async def FadeInAndOut(pwm, timeInSeconds):
     duty = 0
     direction = 1
-    delayTimeInMilliseconds = int(round(timeInSeconds / 255 * PWM_FREQ_HZ, 0));
+    delayTimeInMilliseconds = int(round(timeInSeconds / 255 * PWM_FREQ_HZ, 0))
     for _ in range(2 * 256):
         duty += direction
         if duty > 255:
@@ -32,17 +35,19 @@ async def FadeInAndOut(pwm, timeInSeconds):
         pwm.duty_u16(duty * duty)
         time.sleep(delayTimeInMilliseconds // 2)
 
+
 async def PulseOut(pwm, pulseTimeInSeconds):
     grain = 255
-    delayTimeInMilliseconds = int(round(pulseTimeInSeconds / grain * 1000, 0));
+    delayTimeInMilliseconds = int(round(pulseTimeInSeconds / grain * 1000, 0))
     for rampIndex in range(grain, 0, -1):
-        brightness = int(ea.ease_out_expo(rampIndex/grain) * grain)
+        brightness = int(ea.ease_out_expo(rampIndex / grain) * grain)
         pwm.duty_u16(brightness * brightness)
         time.sleep(delayTimeInMilliseconds)
 
+
 def TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, timeInMs, transition_fn):
 
-    ColorToDC = lambda x: x*x
+    ColorToDC = lambda x: x * x
 
     frames = timeInMs
 
@@ -58,9 +63,9 @@ def TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, timeInMs, transition_f
     bluEndingDutyCycle = ColorToDC(endColor.b) * 1000
     bluDistance = bluEndingDutyCycle - bluStartingDutyCycle
 
-    redDutyCycle, grnDutyCycle, bluDutyCycle = (0,0,0)
-    for frame in range(1, frames+1):
-        scaleFactor = transition_fn(frame/frames)
+    redDutyCycle, grnDutyCycle, bluDutyCycle = (0, 0, 0)
+    for frame in range(1, frames + 1):
+        scaleFactor = transition_fn(frame / frames)
         redDutyCycle = redStartingDutyCycle + int(redDistance * scaleFactor)
         bluDutyCycle = bluStartingDutyCycle + int(bluDistance * scaleFactor)
         grnDutyCycle = grnStartingDutyCycle + int(grnDistance * scaleFactor)
@@ -71,6 +76,7 @@ def TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, timeInMs, transition_f
 
         time.sleep_us(1000)
 
+
 def TransitionColors(pwmr, pwmg, pwmb):
     startColor = RGB((0, 0, 0))
     endColor = RGB()
@@ -80,24 +86,27 @@ def TransitionColors(pwmr, pwmg, pwmb):
         TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, 3_500, ea.ease_out_sine)
         startColor = RGB((endColor.r, endColor.g, endColor.b))
         endColor.randomFromPalette()
-        while (endColor == startColor):
+        while endColor == startColor:
             endColor.randomFromPalette()
     endColor = RGB()
     TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, 3_000, ea.ease_out_expo)
 
+
 def breathe(pwmr, pwmg, pwmb, color):
-        startColor = RGB((0,0,0))
-        endColor = color
-        TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, 2500, ea.ease_inout_cubic)
-        time.sleep_ms(500)
-        TransitionRGB(pwmr, pwmg, pwmb, endColor, startColor, 3000, ea.ease_out_cubic)
-        time.sleep_ms(500)
+    startColor = RGB((0, 0, 0))
+    endColor = color
+    TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, 2500, ea.ease_inout_cubic)
+    time.sleep_ms(500)
+    TransitionRGB(pwmr, pwmg, pwmb, endColor, startColor, 3000, ea.ease_out_cubic)
+    time.sleep_ms(500)
+
 
 def blink_led():
     onboardLed = Pin(25, Pin.OUT)
     for _ in range(4):
         onboardLed.toggle()
-        time.sleep_ms(125)            
+        time.sleep_ms(125)
+
 
 def main():
     blink_led()
@@ -111,20 +120,20 @@ def main():
     color.randomFromPalette()
     color.dump()
     color.darken()
-    color.multiply(.1)
+    color.multiply(0.1)
     for _ in range(500):
         breathe(pwmr, pwmg, pwmb, color)
         color.randomFromPalette()
         color.darken()
-        color.multiply(.2)
+        color.multiply(0.2)
         color.dump()
         print()
-
 
     pwmr.deinit
     pwmg.deinit
     pwmb.deinit
 
     blink_led()
+
 
 main()
