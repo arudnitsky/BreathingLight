@@ -1,6 +1,0 @@
-{
-    "sync_folder": "",
-    "open_on_start": true,
-    "manual_com_device": "/dev/tty.usbmodem0000000000001",
-    "ctrl_c_on_connect": "true"
-}

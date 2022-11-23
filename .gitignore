@@ -1,5 +1,11 @@
 .DS_Store
-.vscode/
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # vi swap file
 *.swp
