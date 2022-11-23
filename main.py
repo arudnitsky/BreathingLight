@@ -1,7 +1,7 @@
 from machine import Pin, PWM
 import time
 import easings as ea
-from RGB import RGB
+from rgb import RGB 
 
 PWM_FREQ_HZ = 1_000
 
@@ -95,9 +95,9 @@ def TransitionColors(pwmr, pwmg, pwmb):
 def breathe(pwmr, pwmg, pwmb, color):
     startColor = RGB((0, 0, 0))
     endColor = color
-    TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, 2500, ea.ease_inout_cubic)
+    TransitionRGB(pwmr, pwmg, pwmb, startColor, endColor, 2000, ea.ease_inout_cubic)
     time.sleep_ms(500)
-    TransitionRGB(pwmr, pwmg, pwmb, endColor, startColor, 3000, ea.ease_out_cubic)
+    TransitionRGB(pwmr, pwmg, pwmb, endColor, startColor, 2500, ea.ease_out_cubic)
     time.sleep_ms(500)
 
 
@@ -109,7 +109,6 @@ def blink_led():
 
 
 def main():
-    blink_led()
 
     pwmr = InitPwmOnPin(0)
     pwmg = InitPwmOnPin(1)
@@ -121,11 +120,11 @@ def main():
     color.dump()
     color.darken()
     color.multiply(0.1)
-    for _ in range(500):
+    for _ in range(10_000):
         breathe(pwmr, pwmg, pwmb, color)
         color.randomFromPalette()
         color.darken()
-        color.multiply(0.2)
+        # color.multiply(0.2)
         color.dump()
         print()
 
@@ -134,6 +133,5 @@ def main():
     pwmb.deinit
 
     blink_led()
-
 
 main()
